@@ -1,6 +1,21 @@
 <resources>
     <string name="app_name">Inventory Manager</string>
 
+    <string name="product">Product</string>
+    <string name="product_preview">Product Preview</string>
+    <string name="product_image">Product Image</string>
+    <string name="delete_product">Delete Product</string>
+    <string name="add_product">Add Product</string>
+    <string name="back">Back</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="confirm">Confirm</string>
+    <string name="deletion_prompt">Do you want to delete</string>
+
+    <string name="image">Image</string>
+    <string name="add_image">Add Image</string>
+
+    <string name="name">Name</string>
+
     <string name="show_password">Show Password</string>
     <string name="hide_password">Hide Password</string>
 </resources>
