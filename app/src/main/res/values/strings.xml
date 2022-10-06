@@ -16,9 +16,11 @@
 
     <string name="name">Name</string>
 
-    <string name="camera_rationale">Camera permission was denied.</string>
-    <string name="camera_permission">Camera permission required.</string>
-    <string name="reuqest_permission">Request Permission</string>
+    <string name="camera_rationale">Camera permission required.</string>
+    <string name="camera_permission_denied">
+        Camera permission permanently denied click to open the settings page for this app.
+    </string>
+    <string name="request_permission">Request Permission</string>
 
     <string name="code_not_uuid">Code scanned is not a valid UUID.</string>
     <string name="multiple_codes">Multiple codes detected, please scan just one.</string>

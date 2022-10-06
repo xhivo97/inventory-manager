@@ -62,15 +62,15 @@ private fun CameraPermissionContent(
         Text(
             textAlign = TextAlign.Center,
             text = when (showRationale) {
-                true -> ""
-                else -> ""
+                true -> stringResource(R.string.camera_rationale)
+                else -> stringResource(R.string.camera_permission_denied)
             },
         )
         FilledTonalButton(
             onClick = { requestPermission() },
             modifier = Modifier.padding(top = 16.dp),
         ) {
-            Text("")
+            Text(stringResource(R.string.request_permission))
         }
     }
 }
