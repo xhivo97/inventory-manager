@@ -9,11 +9,11 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,28 +24,59 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
-import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
 import com.xhivo97.inventorymanager.R
+import com.xhivo97.inventorymanager.screens.common.PreviewAll
+import com.xhivo97.inventorymanager.screens.util.LaunchWithPermission
 import com.xhivo97.inventorymanager.screens.util.QRCodeScanner
+import com.xhivo97.inventorymanager.ui.theme.InventoryManagerTheme
 
 @Composable
 fun CameraViewport(
-    modifier: Modifier = Modifier,
     onScanned: (String) -> Unit = {},
 ) {
-    RequestPermission {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CameraPreview(onSuccess = onScanned)
+    LaunchWithPermission(
+        permission = android.Manifest.permission.CAMERA,
+        permissionContent = { showRationale, requestPermission ->
+            CameraPermissionContent(
+                showRationale = showRationale,
+                requestPermission = requestPermission,
+            )
+        },
+    ) {
+        CameraPreview(onSuccess = onScanned)
+    }
+}
+
+@Composable
+private fun CameraPermissionContent(
+    showRationale: Boolean,
+    requestPermission: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            textAlign = TextAlign.Center,
+            text = when (showRationale) {
+                true -> ""
+                else -> ""
+            },
+        )
+        FilledTonalButton(
+            onClick = { requestPermission() },
+            modifier = Modifier.padding(top = 16.dp),
+        ) {
+            Text("")
         }
     }
 }
 
 @Composable
 fun CameraPreview(
-    modifier: Modifier = Modifier,
     scaleType: PreviewView.ScaleType = PreviewView.ScaleType.FILL_CENTER,
     cameraSelector: CameraSelector = CameraSelector.DEFAULT_BACK_CAMERA,
     onSuccess: (String) -> Unit,
@@ -53,7 +84,6 @@ fun CameraPreview(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     AndroidView(
-        modifier = modifier,
         factory = { context ->
             val previewView = PreviewView(context).also { view ->
                 view.scaleType = scaleType
@@ -88,41 +118,12 @@ fun CameraPreview(
     )
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
+@PreviewAll
 @Composable
-fun RequestPermission(
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    val cameraPermissionState = rememberPermissionState(android.Manifest.permission.CAMERA)
-
-    when (cameraPermissionState.status) {
-        PermissionStatus.Granted -> {
-            content()
-        }
-        is PermissionStatus.Denied -> {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-            ) {
-                val textToShow = when (cameraPermissionState.status.shouldShowRationale) {
-                    true -> stringResource(R.string.camera_rationale)
-                    false -> stringResource(R.string.camera_permission)
-                }
-
-                Text(
-                    textToShow,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                )
-
-                FilledTonalButton(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                    Text(stringResource(R.string.reuqest_permission))
-                }
-            }
+fun CameraPermissionContentPreview() {
+    InventoryManagerTheme {
+        Surface {
+            CameraPermissionContent(showRationale = false, requestPermission = {})
         }
     }
 }

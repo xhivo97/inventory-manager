@@ -13,6 +13,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,8 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.dp
-import com.xhivo97.inventorymanager.database.Database
-import com.xhivo97.inventorymanager.database.InMemoryDatabase
 import com.xhivo97.inventorymanager.screens.common.PreviewAll
 import com.xhivo97.inventorymanager.screens.components.CameraBottomBar
 import com.xhivo97.inventorymanager.screens.components.CameraViewport
@@ -40,8 +40,18 @@ import com.xhivo97.inventorymanager.ui.theme.InventoryManagerTheme
 
 @SuppressLint("UnsafeOptInUsageError")
 @Composable
-fun CameraScreen(db: Database) {
-    var qrCode by rememberSaveable { mutableStateOf("") }
+fun CameraScreen() {
+    CameraScreen { onScanned ->
+        CameraViewport(onScanned = onScanned)
+    }
+}
+
+@Composable
+private fun CameraScreen(
+    code: String = "",
+    cameraView: @Composable (onScanned: (String) -> Unit) -> Unit,
+) {
+    var qrCode by rememberSaveable { mutableStateOf(code) }
 
     @OptIn(ExperimentalMaterial3Api::class) Scaffold(
         bottomBar = {
@@ -61,19 +71,16 @@ fun CameraScreen(db: Database) {
         },
     ) { innerPadding ->
         Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
             color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
         ) {
             Card(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(horizontal = 24.dp)
                     .padding(vertical = 12.dp),
                 shape = RoundedCornerShape(24.dp),
             ) {
-                CameraViewport(onScanned = { qrCode = it })
+                cameraView { qrCode = it }
             }
         }
     }
@@ -81,8 +88,24 @@ fun CameraScreen(db: Database) {
 
 @PreviewAll
 @Composable
-fun CameraScreenPreview() {
+fun CameraScreenNoCodePreview() {
     InventoryManagerTheme {
-        CameraScreen(db = InMemoryDatabase())
+        CameraScreen {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Camera Viewport")
+            }
+        }
+    }
+}
+
+@PreviewAll
+@Composable
+fun CameraScreenWithCodePreview() {
+    InventoryManagerTheme {
+        CameraScreen(code = "c4186a75-9182-4c3b-9116-f9906ff56569") {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Camera Viewport")
+            }
+        }
     }
 }
